@@ -1,28 +1,40 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go
+name: Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
 
 jobs:
-
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build Binaries
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o wisshrd-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o wisshrd-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o wisshrd-linux-amd64
+          GOOS=linux GOARCH=arm64 go build -o wisshrd-linux-arm64
+          chmod +x wisshrd-*
 
-    - name: Test
-      run: go test -v ./...
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            wisshrd-darwin-amd64
+            wisshrd-darwin-arm64
+            wisshrd-linux-amd64
+            wisshrd-linux-arm64
+          draft: false
+          prerelease: false
+          generate_release_notes: true
