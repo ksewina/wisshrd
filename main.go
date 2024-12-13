@@ -12,8 +12,8 @@ import (
 )
 
 type SSHConfig struct {
-    Keys     []string // Local SSH key user (usually current user)
-    Accounts []string // Service accounts like admin, editor, etc.
+    Keys     []string // local SSH key
+    Accounts []string // service accounts 
     Hosts    []string
     Jumps    []string
 }
@@ -52,7 +52,7 @@ func saveStoredData(data *StoredData) error {
         return err
     }
 
-    return os.WriteFile("history.json", jsonData, 0644)
+    return os.WriteFile("history.json", jsonData, 0600)
 }
 
 func addUniqueToSlice(slice []string, item string) []string {
