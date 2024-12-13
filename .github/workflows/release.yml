@@ -19,12 +19,16 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
       - name: Build Binaries
         run: |
-          GOOS=darwin GOARCH=amd64 go build -o wisshrd-darwin-amd64
-          GOOS=darwin GOARCH=arm64 go build -o wisshrd-darwin-arm64
-          GOOS=linux GOARCH=amd64 go build -o wisshrd-linux-amd64
-          GOOS=linux GOARCH=arm64 go build -o wisshrd-linux-arm64
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X main.version=${{ env.VERSION }}" -o wisshrd-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-X main.version=${{ env.VERSION }}" -o wisshrd-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -ldflags="-X main.version=${{ env.VERSION }}" -o wisshrd-linux-amd64
+          GOOS=linux GOARCH=arm64 go build -ldflags="-X main.version=${{ env.VERSION }}" -o wisshrd-linux-arm64
           chmod +x wisshrd-*
 
       - name: Create Release
